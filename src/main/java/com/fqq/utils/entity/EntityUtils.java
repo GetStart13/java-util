@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
  *
  * @author Fqq
  */
-public class EntityUtil {
-    private EntityUtil() {
+public class EntityUtils {
+    private EntityUtils() {
 
     }
 
@@ -83,6 +83,16 @@ public class EntityUtil {
         }
     }
 
+    /**
+     * 判断两个类之间的是否是父子关系，JDK 有提供方法 isAssignableFrom()
+     * <br/>
+     * {@code  Parent.class.isAssignableFrom(Child.class)}
+     * <br/>- 此方法意思并非是 父类可由子类声明，而是 子类的实例是否可分配到父类声明
+     *
+     * @param father 父类
+     * @param child  子类
+     * @return 是否是父子关系
+     */
     public static <F, C> boolean isExtends(F father, C child) {
         return multiExtends(father.getClass(), child.getClass());
     }
