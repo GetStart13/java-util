@@ -1,6 +1,7 @@
 import com.fqq.utils.entity.EntityUtils;
 import entity.Grandson;
 import entity.Parent;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.beans.IntrospectionException;
@@ -52,8 +53,9 @@ class MyTest {
     void testToUpperCase() {
         String columnName = "__name__a_dd__  _flag__";
         String toUpperCamelCase = EntityUtils.toUpperCamelCase(columnName);
-        System.out.println(toUpperCamelCase);
+        System.out.println("toUpperCamelCase: " + toUpperCamelCase);
         String caseRegex = EntityUtils.toUpperCamelCaseRegex(columnName);
-        System.out.println(caseRegex);
+        System.out.println("toUpperCamelCaseRegex: " + caseRegex);
+        Assertions.assertEquals(toUpperCamelCase, caseRegex);
     }
 }

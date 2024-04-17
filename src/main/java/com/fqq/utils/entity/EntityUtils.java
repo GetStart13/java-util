@@ -25,7 +25,8 @@ public class EntityUtils {
     /**
      * 此方法每次获取都会执行一次循环，Introspector 内部做了缓存
      */
-    public static Object findFieldValue(Object entity, String fieldName) throws IllegalAccessException, IntrospectionException, InvocationTargetException {
+    public static Object findFieldValue(Object entity, String fieldName)
+        throws IllegalAccessException, IntrospectionException, InvocationTargetException {
         BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
         for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
@@ -41,7 +42,8 @@ public class EntityUtils {
     /**
      * 获取实体属性值
      */
-    public static Object getFieldValue(Object entity, String fieldName) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+    public static Object getFieldValue(Object entity, String fieldName)
+        throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         return new PropertyDescriptor(fieldName, entity.getClass()).getReadMethod().invoke(entity);
     }
 
@@ -62,8 +64,8 @@ public class EntityUtils {
         // 判断是否是父子类关系
         if (!isExtends(father, child)) {
             throw new ClassCastException(father.getClass().getSimpleName()
-                    + " and "
-                    + child.getClass().getSimpleName() + "is not inheritance relationship");
+                + " and "
+                + child.getClass().getSimpleName() + "is not inheritance relationship");
         }
 
         Class<?> fatherClass = father.getClass();
@@ -107,17 +109,25 @@ public class EntityUtils {
         return multiExtends(father, child.getSuperclass());
     }
 
-    public static String toUnderScoreCase(String fieldName) {
+    /**
+     * 驼峰命名转下划线命名
+     *
+     * @param fieldName 字段名
+     * @return 下划线字段名
+     */
+    public static String toUnderscoreCase(String fieldName) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < fieldName.length(); i++) {
+        // Do not add "_" for the first character.
+        stringBuilder.append(Character.toLowerCase(fieldName.charAt(0)));
+        for (int i = 1; i < fieldName.length(); i++) {
             char c = fieldName.charAt(i);
             if (Character.isLowerCase(c)) {
                 stringBuilder
-                        .append(c);
+                    .append(c);
             } else {
                 stringBuilder
-                        .append('_')
-                        .append(Character.toLowerCase(c));
+                    .append("_")
+                    .append(Character.toLowerCase(c));
             }
         }
         return stringBuilder.toString();
@@ -131,15 +141,15 @@ public class EntityUtils {
      */
     public static String toUpperCamelCaseRegex(String columnName) {
         // 去除开头下划线
-        String replaceFirst = columnName.replaceFirst("(_+)", "");
+        String replaceFirst = columnName.replaceFirst("^(_+)", "");
         return Pattern
-                // 匹配下划线和字母结束的分组
-                .compile("(_+[A-Za-z])")
-                .matcher(replaceFirst)
-                // 将分组去掉下划线，并将字母转大写
-                .replaceAll(m -> m.group().replaceFirst("(_+)", "").toUpperCase())
-                // 去掉所有下划线和空白字符
-                .replaceAll("(_)|(\\s)", "");
+            // 匹配下划线和字母结束的分组
+            .compile("(_+[A-Za-z])")
+            .matcher(replaceFirst)
+            // 将分组去掉下划线，并将字母转大写
+            .replaceAll(m -> m.group().replaceFirst("(_+)", "").toUpperCase())
+            // 去掉所有下划线和空白字符
+            .replaceAll("(_)|(\\s)", "");
     }
 
     /**
@@ -149,21 +159,28 @@ public class EntityUtils {
      * @return 转化结果
      */
     public static String toUpperCamelCase(String columnName) {
-        String[] strings = columnName.split("_");
-        StringBuilder builder = new StringBuilder();
-        boolean firstConvertFlag = true;
-        for (String string : strings) {
-            if (!string.isBlank()) {
-                String str = string.substring(0, 1).toUpperCase();
-                if (firstConvertFlag) {
-                    str = str.toLowerCase();
-                    firstConvertFlag = false;
-                }
-                builder
-                        .append(str)
-                        .append(string.substring(1));
+        String[] partitions = columnName.split("_");//
+        StringBuilder columnNameBuilder = new StringBuilder();
+        int i = 0;
+        // 第一段分区不大写
+        while (i < partitions.length) {
+            String partition = partitions[i];
+            ++i;
+            if (!partition.isBlank()) {
+                columnNameBuilder.append(partition);
+                break;
             }
         }
-        return builder.toString();
+        while (i < partitions.length) {
+            String partition = partitions[i];
+            ++i;
+            if (!partition.isBlank()) {
+                String letter = partition.substring(0, 1).toUpperCase();
+                columnNameBuilder
+                    .append(letter)
+                    .append(partition.substring(1));
+            }
+        }
+        return columnNameBuilder.toString();
     }
 }
